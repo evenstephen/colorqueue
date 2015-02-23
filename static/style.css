@@ -1,0 +1,13 @@
+body {
+    background-color: #ffffff;
+}
+
+button {
+    width: 25em;  height: 3em;
+}
+
+div {
+    display: none;
+    background-color: #ffffff;
+    width: 50%;
+}

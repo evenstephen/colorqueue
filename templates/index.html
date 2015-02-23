@@ -1,0 +1,56 @@
+<html>
+<head>
+        
+        <link rel="stylesheet" href={{ static_url("style.css") }}>
+        
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+        <script>
+        
+        function get_rgb_string(red, green, blue) {
+            return "rgb(" + red + "," + green + "," + blue + ")";      
+        };
+        
+        $(document).ready(function(){
+                
+            var timeout_time = 15000
+            var timeout_action = function() {
+                $.ajax({type: "GET", url: "/color/timeout", success: function(result){
+                    $("#btn_set").prop( "disabled", true );
+                    $("#btn_fetch").prop( "disabled", false );
+                    $("#info_div").append( result.status + "<br>" );
+                    $("body").removeData( "active_color" );
+                }});
+            };
+                
+            $("#btn_fetch").click(function(){
+                $.ajax({type: "GET", url: "/color/fetch", success: function(result){
+                    $("body").data( "active_color", result );
+                    $("#btn_set").prop( "disabled", false );
+                    $("#btn_fetch").prop( "disabled", true );
+                    var rgb_string = get_rgb_string( $("body").data("active_color").red, $("body").data("active_color").green, $("body").data("active_color").blue );
+                    $("#info_div").append( result.status + " <font style='color:" + rgb_string + ";'>" + rgb_string + "</font> " );
+                    $("#info_div").show();
+                    timeout = setTimeout(timeout_action, timeout_time);
+                }});
+            });
+            
+            $("#btn_set").click(function(){
+                $.ajax({type: "GET", url: "/color/set", success: function(result){
+                    $("#btn_set").prop( "disabled", true );
+                    $("#btn_fetch").prop( "disabled", false );
+                    var rgb_string = get_rgb_string( $("body").data("active_color").red, $("body").data("active_color").green, $("body").data("active_color").blue );
+                    $("#info_div").append( result.status, "<br>" );
+                    $("body").css("background-color", rgb_string);
+                    clearTimeout(timeout);
+                }});
+            });
+            
+        });
+        </script>
+</head>
+<body>
+        <button type="button" id="btn_fetch">Fetch</button>
+        <button type="button" id="btn_set" disabled>Set</button>
+        <div id="info_div"><h2>AJAX Request Log</h2></div>
+</body>
+</html>
